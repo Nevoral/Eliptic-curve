@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="cz">
+    <meta charset="utf-8">
+    <meta name="viewport" 
+      content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='source/favicon.png') }}">
+    <link rel="stylesheet" 
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <link rel = "stylesheet" 
+      href = "{{ url_for('static', filename='CSS/style.css') }}">
+    <link rel="stylesheet" 
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>Eliptické šifrování</title>
+    {{ toastr.include_jquery() }}
+    {{ toastr.include_toastr_css() }}
+    {{ toastr.message() }}
+  </head>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" 
+      integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" 
+      crossorigin="anonymous">
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <div class="container-content"> 
+      <form id="form_log" method="POST">
+        <div class="container-alone">
+          <div class="header">
+            <h2>Encoder</h2>
+          </div>
+          <div class="form">
+            <div class="form-control1">
+              <input type="text" 
+                id="a" 
+                name="a" 
+                onchange="checkInputsNum1('a')"
+                value = "{{a}}"
+                autocomplete='off'
+                required>
+              <label for="a"
+                class="label-name">
+                <span class="content-name">Koeficient 'a'</span>
+              </label>
+              <i class="bi bi-check-circle-fill"></i>
+              <i class="bi bi-x-circle-fill"></i>
+              <small>Error message</small>
+            </div>
+            <div class="form-control1">
+              <input type="text" 
+                id="b" 
+                name="b" 
+                onchange="checkInputsNum1('b')"
+                value = "{{b}}"
+                autocomplete='off'
+                required>
+              <label for="b"
+                class="label-name">
+                <span class="content-name">Koeficient 'b'</span>
+              </label>
+              <i class="bi bi-check-circle-fill"></i>
+              <i class="bi bi-x-circle-fill"></i>
+              <small>Error message</small>
+            </div>
+            <div class="form-control1">
+              <input type="text" 
+                id="galoa" 
+                name="galoa" 
+                onchange="checkInputsNum1('galoa')"
+                value = "{{galoa}}"
+                autocomplete='off'
+                required>
+              <label for="galoa"
+                class="label-name">
+                <span class="content-name">Galoa field</span>
+              </label>
+              <i class="bi bi-check-circle-fill"></i>
+              <i class="bi bi-x-circle-fill"></i>
+              <small>Error message</small>
+            </div>
+            <div class="form-control1">
+              <input type="text" 
+                id="k1" 
+                name="k1" 
+                onchange="checkInputsNum1('k1')"
+                value = "{{k1}}"
+                autocomplete='off'
+                required>
+              <label for="k1"
+                class="label-name">
+                <span class="content-name">Soukromý klíč</span>
+              </label>
+              <i class="bi bi-check-circle-fill"></i>
+              <i class="bi bi-x-circle-fill"></i>
+              <small>Error message</small>
+            </div>
+            <div class="form-control">
+              <input type="text" 
+                id="message" 
+                name="message" 
+                onchange="checkInputsEmpty('message')"
+                value = "{{message}}"
+                autocomplete='off'
+                required>
+              <label for="message"
+                class="label-name">
+                <span class="content-name">Message</span>
+              </label>
+              <i class="bi bi-check-circle-fill"></i>
+              <i class="bi bi-x-circle-fill"></i>
+              <small>Error message</small>
+            </div>
+            <button type="submit" 
+              value='encode' 
+              name='action'
+              id="btn_log_submit" >Elip. křivka nad Galoa field 
+            </button>
+          </div>
+          <div class="header">
+            <h2>Decoder</h2>
+          </div>
+          <div class="form">
+            <div class="form-control" 
+              style="display: none;">
+              <input type="text" 
+                id="messager" 
+                name="messager" 
+                value = "{{enc}}"
+                autocomplete='off'
+                >
+              <label for="messager"
+                class="label-name">
+                <span class="content-name">messager</span>
+              </label>
+              <i class="bi bi-check-circle-fill"></i>
+              <i class="bi bi-x-circle-fill"></i>
+              <small>Error message</small>
+            </div>
+            <div class="form-control">
+              <input type="text" 
+                id="k2" 
+                name="k2" 
+                onchange="checkInputsNum('k2')"
+                value = "{{k2}}"
+                autocomplete='off'
+                >
+              <label for="k2"
+                class="label-name">
+                <span class="content-name">Soukromý klíč</span>
+              </label>
+              <i class="bi bi-check-circle-fill"></i>
+              <i class="bi bi-x-circle-fill"></i>
+              <small>Error message</small>
+            </div>
+            <button type="submit" 
+              value='decode' 
+              name='action'
+              id="btn_log_submit" >Decode
+            </button>
+          </div>
+        </div>
+        <div class="container-alone1">
+          <div class="header">
+            <h2>Body křivky</h2>
+          </div>
+          <div class="form-tb">
+            <div class="container-table">
+              <table id='table'>
+                {% for i in range(leng) %}
+                  <tr> 
+                    {% for j in range(13) %}
+                      {% if (i*13 +j) < len %}
+                        <td onclick="markOnClick(this)" class="table-row" id="{{i*13 +j}}">
+                          <input class="hidden-checkbox" 
+                            type="checkbox" 
+                            value="{{i*13 +j}}" 
+                            id="flexCheckDefault" 
+                            hidden
+                            name='checkID'>
+                          {{ elip.points[i*13 +j]["x"]|int|string + ";" + elip.points[i*13 +j]["y"]|int|string }}
+                        </td>
+                      {% else %}
+                      <td></td>
+                      {% endif %}
+                    {% endfor %}
+                  </tr>
+                {% endfor %} 
+              </table>
+            </div>
+          </div>
+          <div class="header">
+            <h2>Rozšifrovaná zpráva</h2>
+          </div>
+          <div class="form">  
+            <h5>{{message2}}</h5>
+          </div>
+        </div>
+      </form>
+    </div>
+    {{ toastr.include_toastr_js() }}
+  </body>
+</html>
